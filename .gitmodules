@@ -1,0 +1,3 @@
+[submodule "external/ogre"]
+	path = external/ogre
+	url = https://github.com/OGRECave/ogre.git

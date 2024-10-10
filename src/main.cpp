@@ -54,7 +54,7 @@ void Breakout::setup()
 
     // Setting up the bricks
     // First, we add the local directory to the resource group manager
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Meshes", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
     // Array of 20 entities
