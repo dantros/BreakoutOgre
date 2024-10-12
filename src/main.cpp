@@ -106,6 +106,7 @@ void Breakout::setup()
 
     // Create the BreakoutPlayer and attach it to the root
     addInputListener(player);
+    root->addFrameListener(player);
 
     // Create a sphere entity and node
     Ogre::Entity* sphereEntity = scnMgr->createEntity("Sphere", "ball.obj");
