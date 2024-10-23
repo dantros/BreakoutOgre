@@ -29,15 +29,30 @@ void Breakout::setup()
     // Pointer to the default root
     Ogre::Root* root = getRoot();
     Ogre::SceneManager* scnMgr = root->createSceneManager();
+    scnMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
+
+    // Use Ogre's custom shadow mapping ability
+    Ogre::MaterialManager* materialMgr = Ogre::MaterialManager::getSingletonPtr();
+    scnMgr->setShadowTexturePixelFormat(Ogre::PF_DEPTH16);
+    scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE);
+    scnMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
+    scnMgr->setShadowTextureReceiverMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Receiver/RockWall"));
+    scnMgr->setShadowTextureSelfShadow(true);
+    scnMgr->setShadowTextureSize(1024);
+
 
     // Registering the scene with the RTShaderSystem
     Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
 
+    
+
     // A light source is needed
     Ogre::Light* light = scnMgr->createLight("MainLight");
+    light->setType(Ogre::Light::LightTypes::LT_POINT);
     Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    lightNode->setPosition(0, 10, 15);
+    lightNode->setDirection(0,1,-1);
+    lightNode->setPosition(0, 0, 20);
     lightNode->attachObject(light);
 
     // Setting up the camera
@@ -55,21 +70,30 @@ void Breakout::setup()
     // Setting up the bricks
     // First, we add the local directory to the resource group manager
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/textures", "FileSystem");
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/scripts", "FileSystem");
+
+    //Ogre::ResourceGroupManager::getSingleton().declareResource(
+    //    "Examples/EnvMappedRustySteel", "Material", "General");
+
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    //Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("FileSystem");
 
     // Array of 20 entities
-    Ogre::Entity* bricks[21];
+    Ogre::Entity* bricks[22];
     // Array of 20 scene nodes
-    Ogre::SceneNode* brickNodes[24];
+    Ogre::SceneNode* brickNodes[25];
     // Array of 20 bricks
-    BreakoutBrick* bricksActors[24];
+    BreakoutBrick* bricksActors[25];
     // Array of mesh names
-    Ogre::String meshNames[4] = {"purple.obj", "red.obj", "yellow.obj", "green.obj"};
+    Ogre::String meshNames[4] = {"red.obj", "red.obj", "yellow.obj", "green.obj"};
+    Ogre::String meshMaterials[4] = { "Template/Blue", "Template/Red", "Template/RadioactiveGreen", "Examples/TextureEffect4" };
 
     // Loop to create the entities and scene nodes
     for (int i = 0; i < 20; i++)
     {
         bricks[i] = scnMgr->createEntity("Brick" + Ogre::StringConverter::toString(i), meshNames[i / 5]);
+        bricks[i]->getSubEntity(0)->setMaterialName(meshMaterials[i / 5]);
         brickNodes[i] = scnMgr->getRootSceneNode()->createChildSceneNode("Brick" + Ogre::StringConverter::toString(i) + "Node");
         bricksActors[i] = new BreakoutBrick(brickNodes[i]);
         bricksActors[i]->setup(7.5, 2.0);
@@ -104,12 +128,24 @@ void Breakout::setup()
     brickNodes[23]->yaw(Ogre::Degree(90));
     brickNodes[23]->attachObject(bricks[20]);
 
+    // Background
+    bricks[21] = scnMgr->createEntity("Background", "tessellated_cube.obj");
+    bricks[21]->getSubEntity(0)->setMaterialName("TestLevel_b0_m0/TEXFACE/Grass.jpg");
+    brickNodes[24] = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
+    bricksActors[24] = new BreakoutBrick(brickNodes[24], 1);
+    bricksActors[24]->setup(7.5, 2.0);
+    bricksActors[24]->setPos(Ogre::Vector3(0, 0, -5));
+    brickNodes[24]->setOrientation(Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3(1,0,0)));
+    brickNodes[24]->setScale(3,1,3);
+    brickNodes[24]->attachObject(bricks[21]);
+
     // Create the BreakoutPlayer and attach it to the root
     addInputListener(player);
     root->addFrameListener(player);
 
     // Create a sphere entity and node
     Ogre::Entity* sphereEntity = scnMgr->createEntity("Sphere", "ball.obj");
+    sphereEntity->getSubEntity(0)->setMaterialName("Examples/EnvMappedRustySteel");
     Ogre::SceneNode* sphereNode = scnMgr->getRootSceneNode()->createChildSceneNode("SphereNode");
     sphereNode->setPosition(0, -9.0, 0);
     sphereNode->yaw(Ogre::Degree(90));

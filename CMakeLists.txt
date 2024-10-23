@@ -46,9 +46,9 @@ install(
     DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 
-# When executing the exe from visual studio, we the install directory as the working directory,
-# this is to find the asset folder. We need to run the install target before hand se the asset
-# folder is placed there.
+# When executing the exe from visual studio, we use the install directory as the working directory,
+# this is to find the asset folder and configuration files. We need to run the install target before
+# hand so those files are placed there.
 set_target_properties( breakout_ogre
     PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin
 )
