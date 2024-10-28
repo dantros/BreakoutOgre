@@ -1,40 +1,72 @@
 #include "player.h"
 #include <algorithm>
+#include <iostream>
 
 bool BreakoutPlayer::keyPressed(const OgreBites::KeyboardEvent& evt)
 {
-    if (evt.keysym.sym == OgreBites::SDLK_LEFT && brickPos.x >= -10.0)
-    {
-        setPos(brickPos + Ogre::Vector3(-1, 0, 0));
-    }
-    else if (evt.keysym.sym == OgreBites::SDLK_RIGHT && brickPos.x <= 10.0)
-    {
-        setPos(brickPos + Ogre::Vector3(1, 0, 0));
-    }
+
+    if (evt.keysym.sym == OgreBites::SDLK_LEFT or evt.keysym.sym == 'a')
+        direction = Direction::Left;
+
+    if (evt.keysym.sym == OgreBites::SDLK_RIGHT or evt.keysym.sym == 'd')
+        direction = Direction::Right;
+
+    return true;
+}
+
+bool BreakoutPlayer::keyReleased(const OgreBites::KeyboardEvent& evt)
+{
+    if ((evt.keysym.sym == OgreBites::SDLK_LEFT or evt.keysym.sym == 'a') and direction == Direction::Left)
+        direction = Direction::None;
+
+    if ((evt.keysym.sym == OgreBites::SDLK_RIGHT or evt.keysym.sym == 'd') and direction == Direction::Right)
+        direction = Direction::None;
 
     return true;
 }
 
 bool BreakoutPlayer::axisMoved(const OgreBites::AxisEvent& evt)
 {
-    // JoyStick min/max is -32768 / 32767
-    if (evt.axis == 0)
-    {
-        xSpeed = evt.value / 32768.0;
-    }
+    std::cout << evt.type << " - "
+        << evt.which << " - "
+        << evt.axis << " - "
+        << evt.value << std::endl;
 
+/*
+    // JoyStick min/max is -32768 / 32767
+    constexpr int axisMinValue = -32768;
+    constexpr int axisMaxValue = 32767;
+
+    const float axisNormalized = static_cast<float>(evt.value) / (axisMaxValue - axisMinValue);
+    //std::cout << evt.value << " -> " << axisNormalized << std::endl;
+
+    if (axisNormalized < -0.2f)
+        direction = Direction::Left;
+    
+    if (axisNormalized > 0.2f)
+        direction = Direction::Right;
+    
+    else
+        direction = Direction::None;
+*/
     return true;
 }
 
 bool BreakoutPlayer::frameStarted(const Ogre::FrameEvent& evt)
 {
-    if (xSpeed < 0)
+    float dt = evt.timeSinceLastFrame;
+
+    switch (direction)
     {
-        setPos(Ogre::Vector3(std::max(-10.0f, brickPos.x + xSpeed), brickPos.y, brickPos.z));
-    }
-    else
-    {
-        setPos(Ogre::Vector3(std::min(10.0f, brickPos.x + xSpeed), brickPos.y, brickPos.z));
+    case Direction::Left:
+        setPos(Ogre::Vector3(std::max(-20.0f, brickPos.x - xSpeed * dt), brickPos.y, brickPos.z));
+        break;
+    case Direction::Right:
+        setPos(Ogre::Vector3(std::min(20.0f, brickPos.x + xSpeed * dt), brickPos.y, brickPos.z));
+        break;
+    case Direction::None:
+    default:
+        break;
     }
     return true;
 }

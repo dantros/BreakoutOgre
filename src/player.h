@@ -14,10 +14,14 @@ public:
     }
     virtual ~BreakoutPlayer() {}
 
-    bool keyPressed(const OgreBites::KeyboardEvent& evt);
-    bool axisMoved(const OgreBites::AxisEvent& evt);
-    bool frameStarted(const Ogre::FrameEvent& evt); // Called every frame
+    bool keyPressed(const OgreBites::KeyboardEvent& evt) override;
+    bool keyReleased(const OgreBites::KeyboardEvent& evt) override;
+    bool axisMoved(const OgreBites::AxisEvent& evt) override;
+    bool frameStarted(const Ogre::FrameEvent& evt) override; // Called every frame
 
 private:
-    float xSpeed = 0.0;
+    float xSpeed = 20.0;
+
+    enum class Direction : char { Left, Right, None };
+    Direction direction = Direction::None;
 };
