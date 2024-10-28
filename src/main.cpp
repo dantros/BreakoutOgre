@@ -1,7 +1,7 @@
 #include "Ogre.h"
-#include "OgreApplicationContext.h"
-#include "OgreInput.h"
-#include "OgreRTShaderSystem.h"
+#include <OgreApplicationContext.h>
+#include <OgreInput.h>
+#include <OgreRTShaderSystem.h>
 #include "ball.h"
 #include "brick.h"
 #include "player.h"
@@ -35,10 +35,10 @@ void Breakout::setup()
     Ogre::MaterialManager* materialMgr = Ogre::MaterialManager::getSingletonPtr();
     scnMgr->setShadowTexturePixelFormat(Ogre::PF_DEPTH16);
     scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE);
-    scnMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
+    //scnMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
     scnMgr->setShadowTextureReceiverMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Receiver/RockWall"));
     scnMgr->setShadowTextureSelfShadow(true);
-    scnMgr->setShadowTextureSize(1024);
+    scnMgr->setShadowTextureSize(512);
 
 
     // Registering the scene with the RTShaderSystem
@@ -70,11 +70,11 @@ void Breakout::setup()
     // Setting up the bricks
     // First, we add the local directory to the resource group manager
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets", "FileSystem");
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/textures", "FileSystem");
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/scripts", "FileSystem");
+    //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/textures", "FileSystem");
+    //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/scripts", "FileSystem");
 
-    //Ogre::ResourceGroupManager::getSingleton().declareResource(
-    //    "Examples/EnvMappedRustySteel", "Material", "General");
+    Ogre::ResourceGroupManager::getSingleton().declareResource(
+        "Examples/EnvMappedRustySteel", "Material", "General");
 
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
     //Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("FileSystem");
@@ -87,7 +87,7 @@ void Breakout::setup()
     BreakoutBrick* bricksActors[25];
     // Array of mesh names
     Ogre::String meshNames[4] = {"red.obj", "red.obj", "yellow.obj", "green.obj"};
-    Ogre::String meshMaterials[4] = { "Template/Blue", "Template/Red", "Template/RadioactiveGreen", "Examples/TextureEffect4" };
+    Ogre::String meshMaterials[4] = { "Examples/EnvMappedRustySteel", "Template/Red", "Template/RadioactiveGreen", "Examples/TextureEffect4" };
 
     // Loop to create the entities and scene nodes
     for (int i = 0; i < 20; i++)
@@ -129,7 +129,7 @@ void Breakout::setup()
     brickNodes[23]->attachObject(bricks[20]);
 
     // Background
-    bricks[21] = scnMgr->createEntity("Background", "tessellated_cube.obj");
+    bricks[21] = scnMgr->createEntity("Background", "yellow.obj");
     bricks[21]->getSubEntity(0)->setMaterialName("TestLevel_b0_m0/TEXFACE/Grass.jpg");
     brickNodes[24] = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
     bricksActors[24] = new BreakoutBrick(brickNodes[24], 1);
