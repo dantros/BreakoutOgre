@@ -26,11 +26,6 @@ void Breakout::setup()
 {
     // Calling the base first, adding the input listener
     OgreBites::ApplicationContext::setup();
-    //Ogre::FileSystemLayer fsl("breakout_ogre");
-    //Ogre::String aux = fsl.getWritablePath("hi.txt");
-
-    //std::cout << "TEST = " << aux << std::endl;
-
 
     addInputListener(this);
 
@@ -48,12 +43,9 @@ void Breakout::setup()
     scnMgr->setShadowTextureSelfShadow(true);
     scnMgr->setShadowTextureSize(512);
 
-
     // Registering the scene with the RTShaderSystem
     Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
-
-    
 
     // A light source is needed
     Ogre::Light* light = scnMgr->createLight("MainLight");
@@ -75,21 +67,6 @@ void Breakout::setup()
     // Setting up the viewport
     getRenderWindow()->addViewport(cam);
 
-    // Setting up the bricks
-    // First, we add the local directory to the resource group manager
-    //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets", "FileSystem");
-    //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/textures", "FileSystem");
-    //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/scripts", "FileSystem");
-
-    /*Ogre::ResourceGroupManager::getSingleton().declareResource(
-        "Examples/EnvMappedRustySteel", "Material", "General");
-
-    Ogre::ResourceGroupManager::getSingleton().declareResource(
-        "Examples", "Material", "General");*/
-
-    //Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-    //Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("FileSystem");
-
     // Array of 20 entities
     Ogre::Entity* bricks[22];
     // Array of 20 scene nodes
@@ -97,14 +74,13 @@ void Breakout::setup()
     // Array of 20 bricks
     BreakoutBrick* bricksActors[25];
     // Array of mesh names
-    Ogre::String meshNames[4] = {"red.obj", "red.obj", "yellow.obj", "green.obj"};
-    Ogre::String meshMaterials[4] = { "Examples/EnvMappedRustySteel", "red", "Examples/Chrome", "Examples/TextureEffect4" };
+    std::vector<Ogre::String> meshMaterials{ "Basics/Red", "Basics/Green", "Basics/Blue", "Basics/Yellow", "Basics/Purple", "Basics/Aqua" };
 
     // Loop to create the entities and scene nodes
     for (int i = 0; i < 20; i++)
     {
-        bricks[i] = scnMgr->createEntity("Brick" + Ogre::StringConverter::toString(i), meshNames[i / 5]);
-        bricks[i]->getSubEntity(0)->setMaterialName(meshMaterials[i / 5]);
+        bricks[i] = scnMgr->createEntity("Brick" + Ogre::StringConverter::toString(i), "red.obj");
+        bricks[i]->getSubEntity(0)->setMaterialName(meshMaterials[i / meshMaterials.size()]);
         brickNodes[i] = scnMgr->getRootSceneNode()->createChildSceneNode("Brick" + Ogre::StringConverter::toString(i) + "Node");
         bricksActors[i] = new BreakoutBrick(brickNodes[i]);
         bricksActors[i]->setup(7.5, 2.0);
