@@ -1,7 +1,9 @@
-#include "Ogre.h"
+#include <Ogre.h>
 #include <OgreApplicationContext.h>
 #include <OgreInput.h>
 #include <OgreRTShaderSystem.h>
+#include <OgreFileSystemLayer.h>
+//#include <iostream>
 #include "ball.h"
 #include "brick.h"
 #include "player.h"
@@ -24,6 +26,12 @@ void Breakout::setup()
 {
     // Calling the base first, adding the input listener
     OgreBites::ApplicationContext::setup();
+    //Ogre::FileSystemLayer fsl("breakout_ogre");
+    //Ogre::String aux = fsl.getWritablePath("hi.txt");
+
+    //std::cout << "TEST = " << aux << std::endl;
+
+
     addInputListener(this);
 
     // Pointer to the default root
@@ -69,14 +77,17 @@ void Breakout::setup()
 
     // Setting up the bricks
     // First, we add the local directory to the resource group manager
-    Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets", "FileSystem");
+    //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets", "FileSystem");
     //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/textures", "FileSystem");
     //Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/scripts", "FileSystem");
 
-    Ogre::ResourceGroupManager::getSingleton().declareResource(
+    /*Ogre::ResourceGroupManager::getSingleton().declareResource(
         "Examples/EnvMappedRustySteel", "Material", "General");
 
-    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    Ogre::ResourceGroupManager::getSingleton().declareResource(
+        "Examples", "Material", "General");*/
+
+    //Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
     //Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("FileSystem");
 
     // Array of 20 entities
@@ -87,7 +98,7 @@ void Breakout::setup()
     BreakoutBrick* bricksActors[25];
     // Array of mesh names
     Ogre::String meshNames[4] = {"red.obj", "red.obj", "yellow.obj", "green.obj"};
-    Ogre::String meshMaterials[4] = { "Examples/EnvMappedRustySteel", "Template/Red", "Template/RadioactiveGreen", "Examples/TextureEffect4" };
+    Ogre::String meshMaterials[4] = { "Examples/EnvMappedRustySteel", "red", "Examples/Chrome", "Examples/TextureEffect4" };
 
     // Loop to create the entities and scene nodes
     for (int i = 0; i < 20; i++)
@@ -120,6 +131,7 @@ void Breakout::setup()
 
     // Setting up the player brick
     bricks[20] = scnMgr->createEntity("Player", "blue.obj");
+    bricks[20]->getSubEntity(0)->setMaterialName("Examples/EnvMappedRustySteel");
     brickNodes[23] = scnMgr->getRootSceneNode()->createChildSceneNode("PlayerNode");
     BreakoutPlayer* player = new BreakoutPlayer(brickNodes[23]);
     bricksActors[23] = player;
@@ -129,14 +141,14 @@ void Breakout::setup()
     brickNodes[23]->attachObject(bricks[20]);
 
     // Background
-    bricks[21] = scnMgr->createEntity("Background", "yellow.obj");
-    bricks[21]->getSubEntity(0)->setMaterialName("TestLevel_b0_m0/TEXFACE/Grass.jpg");
+    bricks[21] = scnMgr->createEntity("Background", "quad.obj");
+    bricks[21]->getSubEntity(0)->setMaterialName("red");
     brickNodes[24] = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
     bricksActors[24] = new BreakoutBrick(brickNodes[24], 1);
     bricksActors[24]->setup(7.5, 2.0);
     bricksActors[24]->setPos(Ogre::Vector3(0, 0, -5));
     brickNodes[24]->setOrientation(Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3(1,0,0)));
-    brickNodes[24]->setScale(3,1,3);
+    brickNodes[24]->setScale(2,1,2);
     brickNodes[24]->attachObject(bricks[21]);
 
     // Create the BreakoutPlayer and attach it to the root

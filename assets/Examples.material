@@ -724,56 +724,6 @@ material Examples/GrassFloor
 	}
 }
 
-vertex_program Examples/GrassWaverVpCg hlsl
-{
-	source Grass.cg
-	entry_point grass_vp
-}
-fragment_program Examples/GrassWaverFpCg hlsl
-{
-	source Grass.cg
-	entry_point grass_fp
-}
-vertex_program Examples/GrassWaverVpGLSL glsl glsles
-{
-	source GrassVp.glsl
-}
-
-fragment_program Examples/GrassWaverFpGLSL glsl glsles
-{
-	source GrassFp.glsl
-    default_params
-    {
-        param_named diffuseMap int 0
-    }
-}
-
-fragment_program Examples/GrassWaverFp unified
-{
-	delegate Examples/GrassWaverFpGLSL
-	delegate Examples/GrassWaverFpCg
-    default_params
-    {
-		param_named_auto alphaThresh surface_alpha_rejection_value
-    }
-}
-
-vertex_program Examples/GrassWaverVp unified
-{
-	delegate Examples/GrassWaverVpGLSL
-	delegate Examples/GrassWaverVpCg
-
-    default_params
-    {
-        param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto ambient ambient_light_colour
-        param_named_auto objSpaceLight light_position_object_space 0
-        param_named_auto lightColour light_diffuse_colour 0
-
-        param_named_auto offset custom 999
-    }
-}
-
 material Examples/GrassBlades/Caster
 {
     technique
@@ -810,23 +760,6 @@ material Examples/GrassBlades
 				tex_address_mode clamp
                 texture gras_02.png
             }
-        }
-    }
-}
-
-material Examples/GrassBladesWaver : Examples/GrassBlades
-{
-    technique
-    {
-        pass
-        {
-			// Vertex program waving grass
-			vertex_program_ref Examples/GrassWaverVp
-			{
-			}
-			fragment_program_ref Examples/GrassWaverFp
-			{
-			}
         }
     }
 }
@@ -1198,20 +1131,6 @@ material Examples/TransparentBlue50
     }
   }
 }
-
-// material Examples/Passthrough
-// {
-//     technique
-//     {
-//         pass
-//         {
-//             diffuse vertexcolour
-//             specular vertexcolour
-//             ambient vertexcolour
-//             lighting off
-//         }
-//     }
-// }
 
 material DebugSphere1000
 {
