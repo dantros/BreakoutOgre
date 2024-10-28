@@ -117,6 +117,11 @@ install(
     DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 
+install(
+    FILES ${CMAKE_CURRENT_SOURCE_DIR}/plugins.cfg ${CMAKE_CURRENT_SOURCE_DIR}/resources.cfg
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+)
+
 # When executing the exe from visual studio, we use the install directory as the working directory,
 # this is to find the asset folder and configuration files. We need to run the install target before
 # hand so those files are placed there.
