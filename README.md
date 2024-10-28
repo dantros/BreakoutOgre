@@ -12,4 +12,4 @@ Basic Breakout implementation using the Ogre rendering engine.
 
 *At the moment, this has only been tested on Windows with Visual Studio 17 2022 and on Debug build.*
 
-![screenshot](assets/screenshot.webp "screenshot")
+![screenshot](screenshots/screenshot.webp "screenshot")
