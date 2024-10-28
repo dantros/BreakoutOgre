@@ -1,0 +1,145 @@
+
+material Advanced/UnlitWhite
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+
+            texture_unit 
+            {
+                colour_op_ex source1 src_manual src_current 1 1 1
+            }
+        }
+    }
+}
+
+material Advanced/ScrollingClouds
+{
+    technique
+    {
+        pass
+        {
+            ambient 0.5 0.5 0.5
+            diffuse 1.0 1.0 1.0
+            
+            texture_unit 
+            {
+                texture clouds.jpg
+                scroll_anim 0.2 0.1
+            }
+
+            rtshader_system
+            {
+                lighting_stage per_pixel
+            }
+        }
+    }
+}
+
+material Advanced/ScrollingColor
+{
+    technique
+    {
+        pass
+        {
+            ambient 0.5 0.5 0.5
+            diffuse 1.0 1.0 1.0
+            
+            texture_unit 
+            {
+                texture nm_dn.png
+                scroll_anim 0.2 0.1
+            }
+
+            rtshader_system
+            {
+                lighting_stage per_pixel
+            }
+        }
+    }
+}
+
+material Advanced/EnvMappedRustySteel
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture RustySteel.jpg
+			}
+
+			texture_unit
+			{
+				texture spheremap.png
+				colour_op_ex add src_texture src_current
+				colour_op_multipass_fallback one one
+				env_map spherical
+			}
+		}
+	}
+}
+
+material Advanced/Rocks
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture BeachStones.jpg
+			}
+		}
+	}
+}
+
+material Advanced/MagicChrome
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.75 0.75 0.75
+			cull_hardware none
+
+			texture_unit
+			{
+				texture Chrome.jpg
+				rotate_anim 0.2
+				wave_xform scale_x sine 1 0.1 0 5
+				wave_xform scale_y sine 0.5 0.2 0.5 3
+			}
+		}
+	}
+}
+
+material Advanced/UglyWater
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.7 0.7 0.7
+			cull_hardware none
+
+			texture_unit
+			{
+				texture Water01.jpg
+				scroll_anim -0.25 0.1
+			}
+
+			texture_unit
+			{
+				texture Water01.jpg
+				colour_op_ex add src_texture src_current
+				colour_op_multipass_fallback one one
+				scroll_anim -0.1 0.25
+			}
+		}
+	}
+}

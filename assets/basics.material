@@ -12,6 +12,11 @@ material Basics/Red
             }
         }
     }
+
+    rtshader_system
+    {
+        lighting_stage per_pixel
+    }
 }
 
 material Basics/Green
@@ -26,6 +31,11 @@ material Basics/Green
             }
         }
     }
+    
+    rtshader_system
+    {
+        lighting_stage per_pixel
+    }
 }
 
 material Basics/Blue
@@ -39,6 +49,11 @@ material Basics/Blue
                 colour_op_ex source1 src_manual src_current 0 0 1
             }
         }
+    }
+    
+    rtshader_system
+    {
+        lighting_stage per_pixel
     }
 }
 

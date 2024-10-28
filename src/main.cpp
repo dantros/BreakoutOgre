@@ -74,13 +74,13 @@ void Breakout::setup()
     // Array of 20 bricks
     BreakoutBrick* bricksActors[25];
     // Array of mesh names
-    std::vector<Ogre::String> meshMaterials{ "Basics/Red", "Basics/Green", "Basics/Blue", "Basics/Yellow", "Basics/Purple", "Basics/Aqua" };
+    std::vector<Ogre::String> meshMaterials{ "Basics/Black", "Basics/Green", "Basics/Blue", "Basics/Yellow", "Basics/Purple", "Advanced/ScrollingClouds" };
 
     // Loop to create the entities and scene nodes
     for (int i = 0; i < 20; i++)
     {
-        bricks[i] = scnMgr->createEntity("Brick" + Ogre::StringConverter::toString(i), "red.obj");
-        bricks[i]->getSubEntity(0)->setMaterialName(meshMaterials[i / meshMaterials.size()]);
+        bricks[i] = scnMgr->createEntity("Brick" + Ogre::StringConverter::toString(i), "brick.obj");
+        bricks[i]->getSubEntity(0)->setMaterialName(meshMaterials[i % meshMaterials.size()]);
         brickNodes[i] = scnMgr->getRootSceneNode()->createChildSceneNode("Brick" + Ogre::StringConverter::toString(i) + "Node");
         bricksActors[i] = new BreakoutBrick(brickNodes[i]);
         bricksActors[i]->setup(7.5, 2.0);
@@ -106,8 +106,8 @@ void Breakout::setup()
     bricksActors[22]->setPos(Ogre::Vector3(0, 17.0, 0));
 
     // Setting up the player brick
-    bricks[20] = scnMgr->createEntity("Player", "blue.obj");
-    bricks[20]->getSubEntity(0)->setMaterialName("Examples/EnvMappedRustySteel");
+    bricks[20] = scnMgr->createEntity("Player", "brick.obj");
+    bricks[20]->getSubEntity(0)->setMaterialName("Advanced/UnlitWhite");
     brickNodes[23] = scnMgr->getRootSceneNode()->createChildSceneNode("PlayerNode");
     BreakoutPlayer* player = new BreakoutPlayer(brickNodes[23]);
     bricksActors[23] = player;
@@ -118,13 +118,13 @@ void Breakout::setup()
 
     // Background
     bricks[21] = scnMgr->createEntity("Background", "quad.obj");
-    bricks[21]->getSubEntity(0)->setMaterialName("red");
+    bricks[21]->getSubEntity(0)->setMaterialName("Advanced/ScrollingColor");
     brickNodes[24] = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
     bricksActors[24] = new BreakoutBrick(brickNodes[24], 1);
     bricksActors[24]->setup(7.5, 2.0);
     bricksActors[24]->setPos(Ogre::Vector3(0, 0, -5));
     brickNodes[24]->setOrientation(Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3(1,0,0)));
-    brickNodes[24]->setScale(2,1,2);
+    brickNodes[24]->setScale(3,1,3);
     brickNodes[24]->attachObject(bricks[21]);
 
     // Create the BreakoutPlayer and attach it to the root
@@ -133,7 +133,7 @@ void Breakout::setup()
 
     // Create a sphere entity and node
     Ogre::Entity* sphereEntity = scnMgr->createEntity("Sphere", "ball.obj");
-    sphereEntity->getSubEntity(0)->setMaterialName("Examples/EnvMappedRustySteel");
+    sphereEntity->getSubEntity(0)->setMaterialName("Advanced/EnvMappedRustySteel");
     Ogre::SceneNode* sphereNode = scnMgr->getRootSceneNode()->createChildSceneNode("SphereNode");
     sphereNode->setPosition(0, -9.0, 0);
     sphereNode->yaw(Ogre::Degree(90));
