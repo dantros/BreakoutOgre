@@ -1,3 +1,4 @@
+// Reference: https://wiki.ogre3d.org/Materials
 
 material Advanced/UnlitWhite
 {
@@ -38,25 +39,33 @@ material Advanced/ScrollingClouds
     }
 }
 
+// simple texture transition
 material Advanced/ScrollingColor
 {
     technique
     {
         pass
-        {
-            ambient 0.5 0.5 0.5
-            diffuse 1.0 1.0 1.0
-            
+        {            
             texture_unit 
             {
-                texture nm_dn.png
-                scroll_anim 0.2 0.1
+                texture nm_lf.png
             }
+        }
+		pass
+        {
+			scene_blend alpha_blend
 
-            rtshader_system
+			texture_unit 
             {
-                lighting_stage per_pixel
+                texture alpha_blend.png
+				scroll_anim -0.1 0.2
             }
+			texture_unit
+			{
+				texture nm_dn.png
+				scroll_anim 0.2 0.1
+				colour_op_ex blend_current_alpha src_texture src_current
+			}
         }
     }
 }

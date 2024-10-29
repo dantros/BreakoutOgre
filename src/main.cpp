@@ -37,23 +37,32 @@ void Breakout::setup()
     // Use Ogre's custom shadow mapping ability
     Ogre::MaterialManager* materialMgr = Ogre::MaterialManager::getSingletonPtr();
     scnMgr->setShadowTexturePixelFormat(Ogre::PF_DEPTH16);
-    scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE);
-    //scnMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
+    //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE);
+    //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+    scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_MODULATIVE);
+    //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+    scnMgr->setShadowTextureCount(5); // default is only 1 shadow map
+    //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+    scnMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
     scnMgr->setShadowTextureReceiverMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Receiver/RockWall"));
-    scnMgr->setShadowTextureSelfShadow(true);
-    scnMgr->setShadowTextureSize(512);
+    scnMgr->setShadowTextureSelfShadow(false);
+    //scnMgr->setShadowTextureSelfShadow(true);
+    scnMgr->setShadowTextureSize(1024);
 
     // Registering the scene with the RTShaderSystem
     Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
 
+//#if 0
     // A light source is needed
     Ogre::Light* light = scnMgr->createLight("MainLight");
     light->setType(Ogre::Light::LightTypes::LT_POINT);
+    light->setCastShadows(true);
     Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
     lightNode->setDirection(0,1,-1);
     lightNode->setPosition(0, 0, 20);
     lightNode->attachObject(light);
+//#endif
 
     // Setting up the camera
     Ogre::Camera* cam = scnMgr->createCamera("myCam");
@@ -67,20 +76,24 @@ void Breakout::setup()
     // Setting up the viewport
     getRenderWindow()->addViewport(cam);
 
-    // Array of 20 entities
     Ogre::Entity* bricks[22];
-    // Array of 20 scene nodes
     Ogre::SceneNode* brickNodes[25];
-    // Array of 20 bricks
-    BreakoutBrick* bricksActors[25];
-    // Array of mesh names
-    std::vector<Ogre::String> meshMaterials{ "Basics/Black", "Basics/Green", "Basics/Blue", "Basics/Yellow", "Basics/Purple", "Advanced/ScrollingClouds" };
+    BreakoutBrick* bricksActors[24];
+    std::vector<Ogre::String> meshMaterials{
+        "Basics/Red",
+        "Basics/Green",
+        "Basics/Blue",
+        "Basics/Yellow",
+        "Basics/Purple",
+        "Advanced/ScrollingClouds"
+    };
 
     // Loop to create the entities and scene nodes
     for (int i = 0; i < 20; i++)
     {
         bricks[i] = scnMgr->createEntity("Brick" + Ogre::StringConverter::toString(i), "brick.obj");
         bricks[i]->getSubEntity(0)->setMaterialName(meshMaterials[i % meshMaterials.size()]);
+        bricks[i]->setCastShadows(true); // true is the default anyways.
         brickNodes[i] = scnMgr->getRootSceneNode()->createChildSceneNode("Brick" + Ogre::StringConverter::toString(i) + "Node");
         bricksActors[i] = new BreakoutBrick(brickNodes[i]);
         bricksActors[i]->setup(7.5, 2.0);
@@ -117,15 +130,14 @@ void Breakout::setup()
     brickNodes[23]->attachObject(bricks[20]);
 
     // Background
-    bricks[21] = scnMgr->createEntity("Background", "quad.obj");
-    bricks[21]->getSubEntity(0)->setMaterialName("Advanced/ScrollingColor");
-    brickNodes[24] = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
-    bricksActors[24] = new BreakoutBrick(brickNodes[24], 1);
-    bricksActors[24]->setup(7.5, 2.0);
-    bricksActors[24]->setPos(Ogre::Vector3(0, 0, -5));
-    brickNodes[24]->setOrientation(Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3(1,0,0)));
-    brickNodes[24]->setScale(3,1,3);
-    brickNodes[24]->attachObject(bricks[21]);
+    Ogre::Entity* backgroundEntity = scnMgr->createEntity("Background", "quad.obj");
+    backgroundEntity->getSubEntity(0)->setMaterialName("Advanced/ScrollingColor");
+    backgroundEntity->setCastShadows(false);
+    Ogre::SceneNode* backgroundNode = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
+    backgroundNode->setPosition(Ogre::Vector3(0, 0, -5));
+    backgroundNode->setOrientation(Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3(1,0,0)));
+    backgroundNode->setScale(3,1,3);
+    backgroundNode->attachObject(backgroundEntity);
 
     // Create the BreakoutPlayer and attach it to the root
     addInputListener(player);
@@ -138,6 +150,19 @@ void Breakout::setup()
     sphereNode->setPosition(0, -9.0, 0);
     sphereNode->yaw(Ogre::Degree(90));
     sphereNode->attachObject(sphereEntity);
+
+//#if 0
+    // A light source is needed
+    Ogre::Light* light2 = scnMgr->createLight("SecondaryLight");
+    light2->setType(Ogre::Light::LightTypes::LT_POINT);
+    light2->setCastShadows(true);
+    light2->setAttenuation(50.0, 0.5, 0.0001, 0.0);
+    Ogre::SceneNode* light2Node = scnMgr->getRootSceneNode()->createChildSceneNode();
+    //Ogre::SceneNode* light2Node = brickNodes[23]->createChildSceneNode();
+    light2Node->setDirection(0, 0, -1);
+    light2Node->setPosition(10, 0, 20);
+    light2Node->attachObject(light2);
+//#endif
 
     // Create the BreakoutBall and attach it to the root
     BreakoutBall* breakoutBall = new BreakoutBall(sphereNode, bricksActors, 24);
