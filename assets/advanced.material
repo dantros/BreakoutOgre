@@ -119,9 +119,9 @@ material Advanced/MagicChrome
 			texture_unit
 			{
 				texture Chrome.jpg
-				rotate_anim 0.2
-				wave_xform scale_x sine 1 0.1 0 5
-				wave_xform scale_y sine 0.5 0.2 0.5 3
+				rotate_anim 0.02
+				//wave_xform scale_x sine 1 0.1 0 5
+				//wave_xform scale_y sine 0.5 0.2 0.5 3
 			}
 		}
 	}

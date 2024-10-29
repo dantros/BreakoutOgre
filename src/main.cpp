@@ -16,6 +16,10 @@ public:
 
     void setup();
     bool keyPressed(const OgreBites::KeyboardEvent& evt);
+private:
+    int backgroundMaterialId = 0;
+    std::vector<Ogre::String> backgrounds;
+    Ogre::Entity* backgroundEntity;
 };
 
 Breakout::Breakout() : OgreBites::ApplicationContext("Breakout")
@@ -25,8 +29,16 @@ Breakout::Breakout() : OgreBites::ApplicationContext("Breakout")
 void Breakout::setup()
 {
     // Calling the base first, adding the input listener
+    // This will create a file ogre.cfg at your OS user folder/Breakout. Example: My Documents/Breakout.
+    // that file contains your initial setup, such as window size, full screen, render backend, etc.
+    // This is the way OgreBites work, if we do not want this, we need to implement something equivalent
+    // to OgreBites.
+    // *Important Note*: OgreBites was only meant to be used with Ogre examples, so it is very incomplete
+    // for general purposes. Example: At the time of writting, joystick analog inputs are not properly
+    // detected (all axis are showing the same event parameters for some reason).
     OgreBites::ApplicationContext::setup();
 
+    // Adding an input listener
     addInputListener(this);
 
     // Pointer to the default root
@@ -37,16 +49,18 @@ void Breakout::setup()
     // Use Ogre's custom shadow mapping ability
     Ogre::MaterialManager* materialMgr = Ogre::MaterialManager::getSingletonPtr();
     scnMgr->setShadowTexturePixelFormat(Ogre::PF_DEPTH16);
+    // only MODULATIVE technique is working for some reason.
     //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE);
     //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
     scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_MODULATIVE);
     //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-    scnMgr->setShadowTextureCount(5); // default is only 1 shadow map
-    //scnMgr->setShadowTechnique(Ogre::ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
+
+    // default is only 1 shadow map
+    scnMgr->setShadowTextureCount(5);
     scnMgr->setShadowTextureCasterMaterial(materialMgr->getByName("PSSM/shadow_caster"));
     scnMgr->setShadowTextureReceiverMaterial(materialMgr->getByName("Ogre/DepthShadowmap/Receiver/RockWall"));
+    // for shadow mapping, selkf shadowing is not implemented by default.
     scnMgr->setShadowTextureSelfShadow(false);
-    //scnMgr->setShadowTextureSelfShadow(true);
     scnMgr->setShadowTextureSize(1024);
 
     // Registering the scene with the RTShaderSystem
@@ -76,16 +90,28 @@ void Breakout::setup()
     // Setting up the viewport
     getRenderWindow()->addViewport(cam);
 
-    Ogre::Entity* bricks[22];
-    Ogre::SceneNode* brickNodes[25];
+    // 20 bricks + 3 walls + paddle
+    Ogre::Entity* bricks[24];
+    Ogre::SceneNode* brickNodes[24];
     BreakoutBrick* bricksActors[24];
+
     std::vector<Ogre::String> meshMaterials{
         "Basics/Red",
         "Basics/Green",
         "Basics/Blue",
         "Basics/Yellow",
         "Basics/Purple",
-        "Advanced/ScrollingClouds"
+        "Basics/Aqua"
+    };
+
+    backgrounds = {
+        "Advanced/ScrollingClouds",
+        "Advanced/ScrollingColor",
+        "Basics/Gray",
+        "Basics/Black",
+        "Advanced/MagicChrome",
+        "Advanced/UglyWater",
+        "Advanced/Rocks"
     };
 
     // Loop to create the entities and scene nodes
@@ -119,24 +145,24 @@ void Breakout::setup()
     bricksActors[22]->setPos(Ogre::Vector3(0, 17.0, 0));
 
     // Setting up the player brick
-    bricks[20] = scnMgr->createEntity("Player", "brick.obj");
-    bricks[20]->getSubEntity(0)->setMaterialName("Advanced/UnlitWhite");
+    bricks[23] = scnMgr->createEntity("Player", "brick.obj");
+    bricks[23]->getSubEntity(0)->setMaterialName("Advanced/UnlitWhite");
     brickNodes[23] = scnMgr->getRootSceneNode()->createChildSceneNode("PlayerNode");
     BreakoutPlayer* player = new BreakoutPlayer(brickNodes[23]);
     bricksActors[23] = player;
     bricksActors[23]->setup(7.5, 2.0);
     bricksActors[23]->setPos(Ogre::Vector3(0, -11.0, 0));
     brickNodes[23]->yaw(Ogre::Degree(90));
-    brickNodes[23]->attachObject(bricks[20]);
+    brickNodes[23]->attachObject(bricks[23]);
 
     // Background
-    Ogre::Entity* backgroundEntity = scnMgr->createEntity("Background", "quad.obj");
-    backgroundEntity->getSubEntity(0)->setMaterialName("Advanced/ScrollingColor");
+    backgroundEntity = scnMgr->createEntity("Background", "quad.obj");
+    backgroundEntity->getSubEntity(0)->setMaterialName("Advanced/ScrollingClouds");
     backgroundEntity->setCastShadows(false);
     Ogre::SceneNode* backgroundNode = scnMgr->getRootSceneNode()->createChildSceneNode("BackgroundNode");
     backgroundNode->setPosition(Ogre::Vector3(0, 0, -5));
     backgroundNode->setOrientation(Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3(1,0,0)));
-    backgroundNode->setScale(3,1,3);
+    backgroundNode->setScale(2.5,1,2.5);
     backgroundNode->attachObject(backgroundEntity);
 
     // Create the BreakoutPlayer and attach it to the root
@@ -152,7 +178,7 @@ void Breakout::setup()
     sphereNode->attachObject(sphereEntity);
 
 //#if 0
-    // A light source is needed
+    // second light source, not all combinations work, no error, so be sure it is working when modifying it.
     Ogre::Light* light2 = scnMgr->createLight("SecondaryLight");
     light2->setType(Ogre::Light::LightTypes::LT_POINT);
     light2->setCastShadows(true);
@@ -174,6 +200,11 @@ void Breakout::setup()
 
 bool Breakout::keyPressed(const OgreBites::KeyboardEvent& evt)
 {
+    if (evt.keysym.sym == OgreBites::SDLK_SPACE)
+    {
+        backgroundMaterialId = backgroundMaterialId + 1 < backgrounds.size() ? backgroundMaterialId + 1 : 0;
+        backgroundEntity->getSubEntity(0)->setMaterialName(backgrounds.at(backgroundMaterialId));
+    }
     if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
     {
         getRoot()->queueEndRendering();

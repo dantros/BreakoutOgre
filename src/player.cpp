@@ -27,6 +27,9 @@ bool BreakoutPlayer::keyReleased(const OgreBites::KeyboardEvent& evt)
 
 bool BreakoutPlayer::axisMoved(const OgreBites::AxisEvent& evt)
 {
+    // it looks like this is not working properly...
+    // I'm getting type = 11 or 14, which: always 0, and axis " ", ...
+    // Maybe a problem with OgreBites?
     std::cout << evt.type << " - "
         << evt.which << " - "
         << evt.axis << " - "
